@@ -1,12 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { AccountsService } from './accounts.service';
+import { Controller, Post } from '@nestjs/common';
 
 @Controller()
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  public constructor() {}
 
-  @Get()
-  getHello(): string {
-    return this.accountsService.getHello();
+  @Post("/payment")
+  public async payment() {
+    
   }
 }

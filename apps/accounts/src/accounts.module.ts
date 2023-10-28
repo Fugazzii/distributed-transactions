@@ -1,10 +1,21 @@
 import { Module } from '@nestjs/common';
 import { AccountsController } from './accounts.controller';
-import { AccountsService } from './accounts.service';
+import { AccountModel, AccountsLibModule, AccountsService } from '@app/accounts-lib';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
-  imports: [],
-  controllers: [AccountsController],
-  providers: [AccountsService],
+  imports: [
+    SequelizeModule.forRoot({
+      dialect: "sqlite",
+      storage: "./database/development.sqlite"
+    }),
+    AccountsLibModule
+  ],
+  controllers: [
+    AccountsController
+  ],
+  providers: [
+    AccountsService
+  ]
 })
 export class AccountsModule {}

@@ -26,9 +26,12 @@
     "@nestjs/microservices": "^10.2.7",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/sequelize": "^10.0.0",
+    "amqp-connection-manager": "^4.1.14",
+    "amqplib": "^0.10.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "sequelize": "^6.33.0",
+    "sequelize-typescript": "^2.1.5",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
@@ -71,7 +74,14 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/transactions-lib(|/.*)$": "<rootDir>/libs/transactions-lib/src/$1",
+      "^@app/orchestrator-lib(|/.*)$": "<rootDir>/libs/orchestrator-lib/src/$1",
+      "^@app/blacklist-lib(|/.*)$": "<rootDir>/libs/blacklist-lib/src/$1",
+      "^@app/accounts-lib(|/.*)$": "<rootDir>/libs/accounts-lib/src/$1"
+    }
   }
 }

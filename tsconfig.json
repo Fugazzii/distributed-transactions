@@ -17,6 +17,31 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@app/transactions-lib": [
+        "libs/transactions-lib/src"
+      ],
+      "@app/transactions-lib/*": [
+        "libs/transactions-lib/src/*"
+      ],
+      "@app/orchestrator-lib": [
+        "libs/orchestrator-lib/src"
+      ],
+      "@app/orchestrator-lib/*": [
+        "libs/orchestrator-lib/src/*"
+      ],
+      "@app/blacklist-lib": [
+        "libs/blacklist-lib/src"
+      ],
+      "@app/blacklist-lib/*": [
+        "libs/blacklist-lib/src/*"
+      ],
+      "@app/accounts-lib": [
+        "libs/accounts-lib/src"
+      ],
+      "@app/accounts-lib/*": [
+        "libs/accounts-lib/src/*"
+      ]
+    }
   }
 }

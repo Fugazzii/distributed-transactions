@@ -45,6 +45,42 @@
       "compilerOptions": {
         "tsConfigPath": "apps/orchestrator/tsconfig.app.json"
       }
+    },
+    "transactions-lib": {
+      "type": "library",
+      "root": "libs/transactions-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/transactions-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/transactions-lib/tsconfig.lib.json"
+      }
+    },
+    "orchestrator-lib": {
+      "type": "library",
+      "root": "libs/orchestrator-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/orchestrator-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/orchestrator-lib/tsconfig.lib.json"
+      }
+    },
+    "blacklist-lib": {
+      "type": "library",
+      "root": "libs/blacklist-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/blacklist-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/blacklist-lib/tsconfig.lib.json"
+      }
+    },
+    "accounts-lib": {
+      "type": "library",
+      "root": "libs/accounts-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/accounts-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/accounts-lib/tsconfig.lib.json"
+      }
     }
   }
 }
