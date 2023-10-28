@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/accounts/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/accounts/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/accounts",
+  "projects": {
+    "accounts": {
+      "type": "application",
+      "root": "apps/accounts",
+      "entryFile": "main",
+      "sourceRoot": "apps/accounts/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/accounts/tsconfig.app.json"
+      }
+    },
+    "transactions": {
+      "type": "application",
+      "root": "apps/transactions",
+      "entryFile": "main",
+      "sourceRoot": "apps/transactions/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/transactions/tsconfig.app.json"
+      }
+    },
+    "blacklist": {
+      "type": "application",
+      "root": "apps/blacklist",
+      "entryFile": "main",
+      "sourceRoot": "apps/blacklist/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/blacklist/tsconfig.app.json"
+      }
+    },
+    "orchestrator": {
+      "type": "application",
+      "root": "apps/orchestrator",
+      "entryFile": "main",
+      "sourceRoot": "apps/orchestrator/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/orchestrator/tsconfig.app.json"
+      }
+    }
+  }
+}

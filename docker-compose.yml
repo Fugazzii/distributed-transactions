@@ -1,0 +1,69 @@
+version: '3'
+services:
+
+  # Accounts microservice
+  accounts:
+    build:
+      context: ./
+      dockerfile: ./apps/accounts/Dockerfile
+    env_file:
+      - ./apps/accounts/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - accounts-data:/usr/src/app/data # Add a volume for the SQLite database
+
+  # Blacklist microservice
+  blacklist:
+    build:
+      context: ./
+      dockerfile: ./apps/blacklist/Dockerfile
+    env_file:
+      - ./apps/blacklist/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - blacklist-data:/usr/src/app/data # Add a volume for the SQLite database
+
+  # Orchestrator microservice
+  orchestrator:
+    build:
+      context: ./
+      dockerfile: ./apps/orchestrator/Dockerfile
+    env_file:
+      - ./apps/orchestrator/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  # Transactions microservice
+  transactions:
+    build:
+      context: ./
+      dockerfile: ./apps/transactions/Dockerfile
+    env_file:
+      - ./apps/transactions/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - transactions-data:/usr/src/app/data # Add a volume for the SQLite database
+  
+  # Message broker (RabbitMQ)
+  rabbitmq:
+    image: "rabbitmq:3"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  accounts-data: {} # Volume for Accounts SQLite data
+  blacklist-data: {} # Volume for Blacklist SQLite data
+  transactions-data: {} # Volume for Transactions SQLite data
