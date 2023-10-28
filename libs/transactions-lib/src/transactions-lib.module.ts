@@ -1,8 +1,23 @@
 import { Module } from '@nestjs/common';
-import { TransactionsLibService } from './transactions-lib.service';
+import { TransactionsService } from './transactions.service';
+import { TRANSACTION_REPOSITORY_TOKEN, TransactionSequelizeRepository } from './lib/repositories';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { TransactionModel } from './lib/models';
 
 @Module({
-  providers: [TransactionsLibService],
-  exports: [TransactionsLibService],
+  imports: [
+    SequelizeModule.forFeature([TransactionModel])
+  ],
+  providers: [
+    TransactionsService,
+    {
+      provide: TRANSACTION_REPOSITORY_TOKEN,
+      useClass: TransactionSequelizeRepository
+    }
+  ],
+  exports: [
+    TransactionsService,
+    TRANSACTION_REPOSITORY_TOKEN
+  ]
 })
 export class TransactionsLibModule {}

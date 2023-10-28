@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BlacklistController } from './blacklist.controller';
-import { BlacklistService } from './blacklist.service';
-import { BlacklistLibModule } from '@app/blacklist-lib';
+import { BlacklistLibModule, BlacklistService } from '@app/blacklist-lib';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({

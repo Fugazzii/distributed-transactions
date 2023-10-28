@@ -16,6 +16,7 @@ import { BLACKLIST_REPOSITORY_TOKEN, BlacklistSequelizeRepository } from './lib/
     BlacklistService
   ],
   exports: [
+    BLACKLIST_REPOSITORY_TOKEN,
     BlacklistService
   ]
 })

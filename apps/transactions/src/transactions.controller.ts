@@ -1,12 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { TransactionsService } from './transactions.service';
+import { TransactionsService } from '@app/transactions-lib';
+import { Controller } from '@nestjs/common';
 
 @Controller()
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
-
-  @Get()
-  getHello(): string {
-    return this.transactionsService.getHello();
-  }
+  public constructor(private readonly transactionsService: TransactionsService) {}
 }
