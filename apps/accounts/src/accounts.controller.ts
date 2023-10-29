@@ -1,11 +1,12 @@
 import { Controller, Post } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AccountsController {
   public constructor() {}
 
-  @Post("/payment")
-  public async payment() {
+  @MessagePattern("check_account")
+  public async checkAccount() {
     
   }
 }
