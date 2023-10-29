@@ -82,7 +82,8 @@
       "^@app/orchestrator-lib(|/.*)$": "<rootDir>/libs/orchestrator-lib/src/$1",
       "^@app/blacklist-lib(|/.*)$": "<rootDir>/libs/blacklist-lib/src/$1",
       "^@app/accounts-lib(|/.*)$": "<rootDir>/libs/accounts-lib/src/$1",
-      "^@app/rmq(|/.*)$": "<rootDir>/libs/rmq/src/$1"
+      "^@app/rmq(|/.*)$": "<rootDir>/libs/rmq/src/$1",
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
     }
   }
 }

@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ACCOUNT_REPOSITORY_TOKEN, IAccountRepository } from './lib/repositories';
 import { AccountResponse } from './lib/responses';
 import { CreateAccountDto } from './lib/dtos';
+import { NewTxDto } from '@app/transactions-lib';
+import { ITransaction } from '@app/common';
 
 @Injectable()
 export class AccountsService {
@@ -19,5 +21,9 @@ export class AccountsService {
         const { password, ...accountResponse } = accountEntity;
 
         return accountResponse;
+    }
+
+    public beginPaymentTransaction(txDetails: NewTxDto): Promise<ITransaction> {
+        return this.accountRepository.beginPaymentTransaction(txDetails);
     }
 }

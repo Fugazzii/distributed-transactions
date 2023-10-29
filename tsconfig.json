@@ -41,6 +41,21 @@
       ],
       "@app/accounts-lib/*": [
         "libs/accounts-lib/src/*"
+<<<<<<< Updated upstream
+=======
+      ],
+      "@app/rmq": [
+        "libs/rmq/src"
+      ],
+      "@app/rmq/*": [
+        "libs/rmq/src/*"
+      ],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+>>>>>>> Stashed changes
       ]
     }
   }
