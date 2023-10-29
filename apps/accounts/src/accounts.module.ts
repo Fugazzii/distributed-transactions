@@ -15,7 +15,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
     AccountsController
   ],
   providers: [
-    AccountsService
+    AccountsService,
   ]
 })
 export class AccountsModule {}

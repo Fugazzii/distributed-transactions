@@ -1,20 +1,19 @@
 import { Repository } from "sequelize-typescript";
 import { CreateAccountDto } from "../../dtos";
-import { ACCOUNT_REPOSITORY_TOKEN, IAccountRepository } from "../account.repository.interface";
+import { IAccountRepository } from "../account.repository.interface";
 import { AccountModel } from "../../models";
 import { Injectable } from "@nestjs/common";
 import { AccountEntity } from "../../entities";
 import { InjectModel } from "@nestjs/sequelize";
 import { NewTxDto } from "@app/transactions-lib";
-import { Sequelize, Transaction } from "sequelize";
+import { Sequelize } from "sequelize";
 import { ITransaction, SequelizeTransaction } from "@app/common";
 
 @Injectable()
 export class AccountSequelizeRepository implements IAccountRepository {
     
     public constructor(
-        @InjectModel(AccountModel) private readonly repository: Repository<AccountModel>,
-        private readonly sequelize: Sequelize
+        @InjectModel(AccountModel) private readonly repository: Repository<AccountModel>
     ) {}
     
     public async create(createAccountDto: CreateAccountDto): Promise<number> {
@@ -31,7 +30,8 @@ export class AccountSequelizeRepository implements IAccountRepository {
     }
 
     public async beginPaymentTransaction({ fromAccountId, toAccountId, amount }: Omit<NewTxDto, "password">): Promise<ITransaction> {
-        const sequelizeT = await this.sequelize.transaction();
+        const sequelize = this.repository.sequelize;
+        const sequelizeT = await sequelize.transaction();
         const t = new SequelizeTransaction(sequelizeT);
 
         await this.repository.update(

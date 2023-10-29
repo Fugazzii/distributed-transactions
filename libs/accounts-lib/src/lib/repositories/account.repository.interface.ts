@@ -1,7 +1,6 @@
 import { NewTxDto } from "@app/transactions-lib";
 import { CreateAccountDto } from "../dtos";
 import { AccountEntity } from "../entities";
-import { Transaction } from "sequelize";
 import { ITransaction } from "@app/common";
 
 export const ACCOUNT_REPOSITORY_TOKEN = Symbol("ACCOUNT_REPOSITORY_TOKEN");
