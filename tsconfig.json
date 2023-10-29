@@ -41,12 +41,6 @@
       ],
       "@app/accounts-lib/*": [
         "libs/accounts-lib/src/*"
-      ],
-      "@app/rmq": [
-        "libs/rmq/src"
-      ],
-      "@app/rmq/*": [
-        "libs/rmq/src/*"
       ]
     }
   }

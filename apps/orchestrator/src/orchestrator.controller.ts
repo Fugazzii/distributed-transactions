@@ -1,17 +1,12 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { OrchestratorService } from './orchestrator.service';
-import { NewTxDto } from '@app/transactions-lib';
 
 @Controller()
 export class OrchestratorController {
-  
-  public constructor(
-    private readonly orchestratorService: OrchestratorService
-  ) {}
+  constructor(private readonly orchestratorService: OrchestratorService) {}
 
-  @Post("/payment")
-  public payment(@Body() newTxDto: NewTxDto) {
-    return this.orchestratorService.performPayment(newTxDto);
+  @Get()
+  getHello(): string {
+    return this.orchestratorService.getHello();
   }
-    
 }
