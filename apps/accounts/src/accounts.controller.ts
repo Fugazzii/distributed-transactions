@@ -1,11 +1,9 @@
 import { AccountsService } from '@app/accounts-lib';
-import { AccountMessage } from '@app/rmq';
+import { ITransaction } from '@app/common';
+import { AccountEvent, AccountMessage } from '@app/rmq';
 import { NewTxDto } from '@app/transactions-lib';
 import { Controller, Post } from '@nestjs/common';
-<<<<<<< Updated upstream
-=======
-import { MessagePattern, Payload } from '@nestjs/microservices';
->>>>>>> Stashed changes
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class AccountsController {
@@ -14,13 +12,8 @@ export class AccountsController {
     private readonly accountsService: AccountsService
   ) {}
 
-<<<<<<< Updated upstream
-  @Post("/payment")
-  public async payment() {
-    
-=======
   @MessagePattern(AccountMessage.VERIFY)
-  public async verifyAccount(@Payload() dataStr: string): Promise<boolean> {
+  public async verifyAccount(@Payload() dataStr: string): Promise<ITransaction> {
     const txDetails: Omit<NewTxDto, "password"> = JSON.parse(dataStr);
 
     const fromAccount = await this.accountsService.findAccount(txDetails.fromAccountId);
@@ -29,11 +22,20 @@ export class AccountsController {
     const accountsExist = !!fromAccount && !!toAccount;
     const hasSufficientFunds = fromAccount.balance >= txDetails.amount;
 
-    /** 
-     * TODO: begin transaction
-    */
+    if(!accountsExist || !hasSufficientFunds) {
+      return null;
+    }
 
-    return accountsExist && hasSufficientFunds;
->>>>>>> Stashed changes
+    return this.accountsService.beginPaymentTransaction(txDetails);
+  }
+
+  @EventPattern(AccountEvent.COMMIT)
+  public commit(t: ITransaction): Promise<void> {
+    return t.commit();
+  }
+
+  @EventPattern(AccountEvent.ROLLBACK)
+  public rollback(t: ITransaction): Promise<void> {
+    return t.rollback();
   }
 }
