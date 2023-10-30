@@ -8,6 +8,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { NewTxDto } from "@app/transactions-lib";
 import { Sequelize } from "sequelize";
 import { ITransaction, SequelizeTransaction } from "@app/common";
+import { AccountResponse } from "../../responses";
 
 @Injectable()
 export class AccountSequelizeRepository implements IAccountRepository {
@@ -16,13 +17,11 @@ export class AccountSequelizeRepository implements IAccountRepository {
         @InjectModel(AccountModel) private readonly repository: Repository<AccountModel>
     ) {}
     
-    public async create(createAccountDto: CreateAccountDto): Promise<number> {
-        const { id } = await this.repository.create({
+    public async create(createAccountDto: CreateAccountDto): Promise<AccountResponse> {
+        return this.repository.create({
             ...createAccountDto,
             balance: 0
         });
-
-        return id;
     }
     
     public async findOne(id: number): Promise<AccountEntity> {

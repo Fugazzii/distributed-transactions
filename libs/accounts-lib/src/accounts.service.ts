@@ -11,7 +11,7 @@ export class AccountsService {
         @Inject(ACCOUNT_REPOSITORY_TOKEN) private readonly accountRepository: IAccountRepository
     ) {}
 
-    public async createAccount(createAccountDto: CreateAccountDto): Promise<number> {
+    public createAccount(createAccountDto: CreateAccountDto): Promise<AccountResponse> {
         return this.accountRepository.create(createAccountDto);
     }
 

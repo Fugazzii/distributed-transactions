@@ -1,3 +1,4 @@
 export enum AccountMessage {
-    VERIFY = "account.verify"
+    VERIFY = "account.verify",
+    CREATE = "account.create"
 }

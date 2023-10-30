@@ -1,4 +1,4 @@
-import { AccountsService } from '@app/accounts-lib';
+import { AccountResponse, AccountsService } from '@app/accounts-lib';
 import { ITransaction } from '@app/common';
 import { AccountEvent, AccountMessage } from '@app/rmq';
 import { NewTxDto } from '@app/transactions-lib';
@@ -27,6 +27,12 @@ export class AccountsController {
     }
 
     return this.accountsService.beginPaymentTransaction(txDetails);
+  }
+
+  @MessagePattern(AccountMessage.CREATE)
+  public async createAccount(@Payload() createAccountDtoStr: string): Promise<AccountResponse> {
+    const createAccountDto = JSON.parse(createAccountDtoStr);
+    return this.accountsService.createAccount(createAccountDto);
   }
 
   @EventPattern(AccountEvent.COMMIT)
