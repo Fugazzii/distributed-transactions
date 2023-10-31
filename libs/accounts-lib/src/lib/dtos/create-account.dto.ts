@@ -1,6 +1,6 @@
 export class CreateAccountDto {
     public constructor(
-        public readonly username: string,
+        public readonly fullName: string,
         public readonly password: string
     ) {}
 }

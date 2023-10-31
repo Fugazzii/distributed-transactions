@@ -10,10 +10,10 @@ services:
       - ./apps/accounts/.env
     depends_on:
       - rabbitmq
+      - postgres_accounts
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-      - accounts-data:/usr/src/app/data # Add a volume for the SQLite database
 
   # Blacklist microservice
   blacklist:
@@ -24,10 +24,10 @@ services:
       - ./apps/blacklist/.env
     depends_on:
       - rabbitmq
+      - postgres_blacklist
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-      - blacklist-data:/usr/src/app/data # Add a volume for the SQLite database
 
   # Orchestrator microservice
   orchestrator:
@@ -41,6 +41,8 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
 
   # Transactions microservice
   transactions:
@@ -51,19 +53,55 @@ services:
       - ./apps/transactions/.env
     depends_on:
       - rabbitmq
+      - postgres_transactions
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-      - transactions-data:/usr/src/app/data # Add a volume for the SQLite database
+  
+  # Postgres accounts
+  postgres_accounts:
+    image: postgres
+    ports:
+      - 5433:5433
+    environment:
+      POSTGRES_DB: transactions_db
+      POSTGRES_USER: transactions_user
+      POSTGRES_PASSWORD: transactions_password
+    volumes:
+      - postgres_accounts:/var/lib/postgresql/data
+
+  # Postgres blacklist
+  postgres_blacklist:
+    image: postgres
+    ports:
+      - 5434:5434
+    environment:
+      POSTGRES_DB: transactions_db
+      POSTGRES_USER: transactions_user
+      POSTGRES_PASSWORD: transactions_password
+    volumes:
+      - postgres_blacklist:/var/lib/postgresql/data
+
+  # Postgres transactions
+  postgres_transactions:
+    image: postgres
+    ports:
+      - 5435:5435
+    environment:
+      POSTGRES_DB: transactions_db
+      POSTGRES_USER: transactions_user
+      POSTGRES_PASSWORD: transactions_password
+    volumes:
+      - postgres_transactions:/var/lib/postgresql/data
   
   # Message broker (RabbitMQ)
   rabbitmq:
     image: "rabbitmq:3"
     ports:
-      - "5672:5672"
+      - 5672:5672
       - "15672:15672"
 
 volumes:
-  accounts-data: {} # Volume for Accounts SQLite data
-  blacklist-data: {} # Volume for Blacklist SQLite data
-  transactions-data: {} # Volume for Transactions SQLite data
+  postgres_accounts:
+  postgres_blacklist:
+  postgres_transactions:

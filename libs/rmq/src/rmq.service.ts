@@ -10,9 +10,13 @@ export class RmqService {
         this.client = ClientProxyFactory.create({
             transport: Transport.RMQ,
             options: {
-                urls: ["amqp://rabbitmq:5672"]
+                urls: ["amqp://rabbitmq:5672"],
+                queue: "default_queue",
+                queueOptions: {
+                    durable: false
+                }
             }
-        })
+        });
     }
 
     public async connect() {
@@ -32,13 +36,8 @@ export class RmqService {
         );
     }
 
-    public async publishMessage<T>(topic: string, message?: string): Promise<T> {
-        const responseObservable = this.client.send<T>(topic, message);
-
-        return lastValueFrom(
-            responseObservable.pipe(
-                map((data: T) => data)
-            )
-        );
+    public publishMessage<T>(topic: string, message?: string): Observable<T> {
+        return this.client.send<T>(topic, message);
     }
-}
+    
+}   

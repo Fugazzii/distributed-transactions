@@ -3,7 +3,7 @@ import { AutoIncrement, Column, PrimaryKey, Table } from "sequelize-typescript";
 import { AccountEntity } from "../entities";
 
 @Table({ tableName: "accounts" })
-export class AccountModel extends Model implements AccountEntity {
+export class AccountModel extends Model<AccountModel> implements AccountEntity {
     @PrimaryKey
     @AutoIncrement
     @Column

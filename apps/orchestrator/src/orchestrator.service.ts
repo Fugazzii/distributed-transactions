@@ -68,11 +68,18 @@ export class OrchestratorService {
 
   public async createAccount(createAccountDto: CreateAccountDto): Promise<ResponseObject<AccountResponse>> {
     const accountStr = JSON.stringify(createAccountDto);
-    
-    const account = await this.rmqService.publishMessage<AccountResponse>(
+
+    const response$ = this.rmqService.publishMessage<AccountResponse>(
       AccountMessage.CREATE,
       accountStr
     );
+      
+    let account: AccountResponse | null = null;
+    response$.subscribe((data: AccountResponse) => {
+      account = data;
+    });
+
+    console.log("account", account);
 
     return this.successResponse<AccountResponse>("Account successfully created", account);
   }

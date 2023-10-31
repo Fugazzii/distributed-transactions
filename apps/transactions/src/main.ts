@@ -9,7 +9,7 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: ["amqp://rabbitmq:5672"],
-        queue: 'transactions_queue',
+        queue: 'default_queue',
         queueOptions: {
           durable: false
         }

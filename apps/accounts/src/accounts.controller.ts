@@ -2,8 +2,8 @@ import { AccountResponse, AccountsService } from '@app/accounts-lib';
 import { ITransaction } from '@app/common';
 import { AccountEvent, AccountMessage } from '@app/rmq';
 import { NewTxDto } from '@app/transactions-lib';
-import { Controller, Post } from '@nestjs/common';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { Ctx, EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class AccountsController {
@@ -30,18 +30,18 @@ export class AccountsController {
   }
 
   @MessagePattern(AccountMessage.CREATE)
-  public async createAccount(@Payload() createAccountDtoStr: string): Promise<AccountResponse> {
+  public async createAccount(@Payload() createAccountDtoStr: string, @Ctx() _ctx: any): Promise<AccountResponse> {
     const createAccountDto = JSON.parse(createAccountDtoStr);
     return this.accountsService.createAccount(createAccountDto);
   }
 
   @EventPattern(AccountEvent.COMMIT)
-  public commit(t: ITransaction): Promise<void> {
+  public commit(@Payload() t: ITransaction): Promise<void> {
     return t.commit();
   }
 
   @EventPattern(AccountEvent.ROLLBACK)
-  public rollback(t: ITransaction): Promise<void> {
+  public rollback(@Payload() t: ITransaction): Promise<void> {
     return t.rollback();
   }
 }
