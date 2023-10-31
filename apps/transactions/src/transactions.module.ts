@@ -3,6 +3,7 @@ import { TransactionsController } from './transactions.controller';
 import { TransactionsLibModule, TransactionsService } from '@app/transactions-lib';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RmqModule } from '@app/rmq';
 
 @Module({
   imports: [
@@ -16,11 +17,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get<string>('DB_DATABASE'),
         host: configService.get<string>('DB_HOST'),
         dialect: configService.get('DB_DIALECT'),
-        models: [],
         synchronize: true
       }),
       inject: [ConfigService]
     }),
+    RmqModule,
     TransactionsLibModule
   ],
   controllers: [TransactionsController],

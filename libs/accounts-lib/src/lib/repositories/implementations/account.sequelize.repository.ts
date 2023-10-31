@@ -1,14 +1,14 @@
-import { Repository } from "sequelize-typescript";
 import { CreateAccountDto } from "../../dtos";
 import { IAccountRepository } from "../account.repository.interface";
 import { AccountModel } from "../../models";
 import { Injectable } from "@nestjs/common";
 import { AccountEntity } from "../../entities";
-import { InjectModel } from "@nestjs/sequelize";
 import { NewTxDto } from "@app/transactions-lib";
 import { Sequelize } from "sequelize";
 import { ITransaction, SequelizeTransaction } from "@app/common";
 import { AccountResponse } from "../../responses";
+import { InjectModel } from "@nestjs/sequelize";
+import { Repository } from "sequelize-typescript";
 
 @Injectable()
 export class AccountSequelizeRepository implements IAccountRepository {
