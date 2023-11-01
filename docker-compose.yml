@@ -62,11 +62,7 @@ services:
   postgres_accounts:
     image: postgres
     ports:
-      - 5433:5433
-    environment:
-      POSTGRES_DB: transactions_db
-      POSTGRES_USER: transactions_user
-      POSTGRES_PASSWORD: transactions_password
+      - 5433:5432
     volumes:
       - postgres_accounts:/var/lib/postgresql/data
 
@@ -74,11 +70,7 @@ services:
   postgres_blacklist:
     image: postgres
     ports:
-      - 5434:5434
-    environment:
-      POSTGRES_DB: transactions_db
-      POSTGRES_USER: transactions_user
-      POSTGRES_PASSWORD: transactions_password
+      - 5434:5432
     volumes:
       - postgres_blacklist:/var/lib/postgresql/data
 
@@ -86,14 +78,10 @@ services:
   postgres_transactions:
     image: postgres
     ports:
-      - 5435:5435
-    environment:
-      POSTGRES_DB: transactions_db
-      POSTGRES_USER: transactions_user
-      POSTGRES_PASSWORD: transactions_password
+      - 5435:5432
     volumes:
       - postgres_transactions:/var/lib/postgresql/data
-  
+
   # Message broker (RabbitMQ)
   rabbitmq:
     image: "rabbitmq:3"

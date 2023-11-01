@@ -1,5 +1,4 @@
-import { Model } from "sequelize";
-import { AutoIncrement, Column, PrimaryKey, Table } from "sequelize-typescript";
+import { AutoIncrement, Column, PrimaryKey, Table, Model } from "sequelize-typescript";
 import { AccountEntity } from "../entities";
 
 @Table({ tableName: "accounts" })

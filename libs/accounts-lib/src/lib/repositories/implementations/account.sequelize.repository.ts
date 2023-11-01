@@ -4,17 +4,16 @@ import { AccountModel } from "../../models";
 import { Injectable } from "@nestjs/common";
 import { AccountEntity } from "../../entities";
 import { NewTxDto } from "@app/transactions-lib";
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { ITransaction, SequelizeTransaction } from "@app/common";
 import { AccountResponse } from "../../responses";
 import { InjectModel } from "@nestjs/sequelize";
-import { Repository } from "sequelize-typescript";
 
 @Injectable()
 export class AccountSequelizeRepository implements IAccountRepository {
     
     public constructor(
-        @InjectModel(AccountModel) private readonly repository: Repository<AccountModel>
+        @InjectModel(AccountModel) private readonly repository: typeof AccountModel
     ) {}
     
     public async create(createAccountDto: CreateAccountDto): Promise<AccountResponse> {

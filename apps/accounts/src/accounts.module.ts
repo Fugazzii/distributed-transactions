@@ -15,7 +15,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         database: configService.get<string>("DB_DATABASE"),
         host: configService.get<string>("DB_HOST"),
         dialect: configService.get("DB_DIALECT"),
-        synchronize: true
+        synchronize: true,
+        autoLoadModels: true
       }),
       inject: [ConfigService]
     }),
@@ -25,7 +26,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     AccountsController
   ],
   providers: [
-    AccountsService,
+    AccountsService
   ]
 })
 export class AccountsModule {}
