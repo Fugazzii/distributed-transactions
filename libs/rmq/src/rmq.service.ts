@@ -7,8 +7,7 @@ export class RmqService {
     private readonly client: ClientProxy;
 
     public constructor() {
-        this.client = ClientProxyFactory.
-            create({
+        this.client = ClientProxyFactory.create({
                 transport: Transport.RMQ,
                 options: {
                     urls: ["amqp://rabbitmq:5672"],
