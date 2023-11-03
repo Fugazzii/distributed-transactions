@@ -3,6 +3,7 @@ import { AccountsController } from "./accounts.controller";
 import { AccountsLibModule, AccountsService } from "@app/accounts-lib";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { RmqModule } from "@app/rmq";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       }),
       inject: [ConfigService]
     }),
+    RmqModule.forRoot("default_queue"),
     AccountsLibModule
   ],
   controllers: [

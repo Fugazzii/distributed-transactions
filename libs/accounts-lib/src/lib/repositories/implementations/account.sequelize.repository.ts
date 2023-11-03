@@ -17,14 +17,11 @@ export class AccountSequelizeRepository implements IAccountRepository {
     ) {}
     
     public async create(createAccountDto: CreateAccountDto): Promise<AccountResponse> {
-        let obj = {
-            ...createAccountDto,
-            balance: 0
-        };
         try {
-            console.log("obj", obj);
-            const rec = await this.repository.create(obj);
-            console.log("record", rec);
+            const rec = await this.repository.create({
+                ...createAccountDto,
+                balance: 0
+            });
             return rec;                
         } catch (error) {
             console.error("Error in repo", error);

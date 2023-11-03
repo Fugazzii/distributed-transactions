@@ -4,8 +4,13 @@ import { OrchestratorService } from './orchestrator.service';
 import { RmqModule, RmqService } from '@app/rmq';
 
 @Module({
-  imports: [RmqModule],
+  imports: [
+    RmqModule.forRoot("accounts_queue")
+  ],
   controllers: [OrchestratorController],
-  providers: [OrchestratorService, RmqService],
+  providers: [
+    OrchestratorService,
+    RmqService
+  ]
 })
 export class OrchestratorModule {}

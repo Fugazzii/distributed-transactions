@@ -3,6 +3,7 @@ import { BlacklistController } from './blacklist.controller';
 import { BlacklistLibModule, BlacklistService } from '@app/blacklist-lib';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RmqModule } from '@app/rmq';
 
 @Module({
   imports: [
@@ -16,11 +17,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get<string>('DB_DATABASE'),
         host: configService.get<string>('DB_HOST'),
         dialect: configService.get('DB_DIALECT'),
-        models: [],
-        synchronize: true
+        synchronize: true,
+        autoLoadModels: true
       }),
       inject: [ConfigService]
     }),
+    RmqModule.forRoot("default_queue"),
     BlacklistLibModule
   ],
   controllers: [

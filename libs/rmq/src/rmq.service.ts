@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -10,7 +10,7 @@ export class RmqService {
         this.client = ClientProxyFactory.create({
                 transport: Transport.RMQ,
                 options: {
-                    urls: ["amqp://rabbitmq:5672"],
+                    urls: ["amqp://admin:admin@rabbitmq:5672"],
                     queue: "default_queue",
                     queueOptions: {
                         durable: false

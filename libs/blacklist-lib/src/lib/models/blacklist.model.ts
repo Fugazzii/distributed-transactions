@@ -1,7 +1,7 @@
-import { Model } from "sequelize";
 import { BlacklistEntity } from "../entities";
-import { AllowNull, AutoIncrement, Column, PrimaryKey } from "sequelize-typescript";
+import { AllowNull, AutoIncrement, Column, PrimaryKey, Model, Table } from "sequelize-typescript";
 
+@Table({ tableName: "blacklist" })
 export class BlacklistModel extends Model implements BlacklistEntity {
     @PrimaryKey
     @AutoIncrement

@@ -2,7 +2,8 @@ import { AccountResponse, CreateAccountDto } from '@app/accounts-lib';
 import { ITransaction } from '@app/common';
 import { AccountEvent, AccountMessage, BlacklistMessage, RmqService, TransactionEvent, TransactionMessage } from '@app/rmq';
 import { NewTxDto } from '@app/transactions-lib';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 export type ResponseObject<T = undefined> = { 
   success: boolean; 
@@ -14,7 +15,8 @@ export type ResponseObject<T = undefined> = {
 export class OrchestratorService {
   
   public constructor(
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
+    @Inject("accounts_queue") private readonly rmq: ClientProxy
   ) {}
 
   public async performPayment(newTxDto: NewTxDto): Promise<ResponseObject> {
@@ -23,10 +25,15 @@ export class OrchestratorService {
     const txDetailsString = JSON.stringify(txDetails);
 
     // Publish verify message to accounts ms
-    const accountMsSuccessed = await this.rmqService.publishMessage<ITransaction>(
+    const accountResponse$ = this.rmqService.publishMessage<ITransaction>(
       AccountMessage.VERIFY, 
       txDetailsString
     );
+
+    let accountMsSuccessed: ITransaction = null;
+    accountResponse$.subscribe((data: ITransaction | null) => {
+      accountMsSuccessed = data;
+    });
 
     if(!accountMsSuccessed) {
       //! Rollback accounts transaction if it fails
@@ -39,22 +46,32 @@ export class OrchestratorService {
     const txMembersString = JSON.stringify(txMembers);
 
     // Publish verify message to blacklist ms
-    const blacklistMsSuccessed = await this.rmqService.publishMessage<boolean>(
+    const blacklistResponse$ = this.rmqService.publishMessage<boolean>(
       BlacklistMessage.VERIFY,
       txMembersString
     );
+    console.log(blacklistResponse$)
+    let blacklistMsSuccessed = false;
+    blacklistResponse$.subscribe((data: boolean) => {
+      blacklistMsSuccessed = data;
+    });
 
     if(!blacklistMsSuccessed) {
       return this.failureResponse("Transaction failed due to blacklisted member");
     }
     
     // Publish verify message to transactions ms
-    const transactionSuccessed = await this.rmqService.publishMessage<boolean>(
+    const transactionResponse$ = this.rmqService.publishMessage<boolean>(
       TransactionMessage.ADD,
       txDetailsString
     );
 
-    if(!transactionSuccessed) {
+    let transactionMsSuccessed = false;
+    transactionResponse$.subscribe((data: boolean) => {
+      transactionMsSuccessed = data;
+    })
+
+    if(!transactionMsSuccessed) {
       //! Rollback all transactions if here fails
       await this.rollbackAll();
       return this.failureResponse("Failed to perform transaction");
@@ -69,7 +86,7 @@ export class OrchestratorService {
   public async createAccount(createAccountDto: CreateAccountDto): Promise<ResponseObject<AccountResponse>> {
     const accountStr = JSON.stringify(createAccountDto);
 
-    const response$ = this.rmqService.publishMessage<AccountResponse>(
+    const response$ = this.rmq.send<AccountResponse>(
       AccountMessage.CREATE,
       accountStr
     );
@@ -78,8 +95,6 @@ export class OrchestratorService {
     response$.subscribe((data: AccountResponse) => {
       account = data;
     });
-
-    console.log("account", account);
 
     return this.successResponse<AccountResponse>("Account successfully created", account);
   }
