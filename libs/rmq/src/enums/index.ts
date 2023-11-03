@@ -4,3 +4,4 @@ export * from "./events/blacklist.event";
 export * from "./messages/account.message";
 export * from "./messages/transaction.message";
 export * from "./messages/blacklist.message";
+export * from "./queues";

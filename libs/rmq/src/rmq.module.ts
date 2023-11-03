@@ -1,12 +1,12 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { RmqService } from './rmq.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
-@Module({
-  providers: [RmqService],
-  exports: [RmqService]
-})
+@Module({})
 export class RmqModule {
+
+  public constructor() {}
+
   public static forRoot(queue: string): DynamicModule {
     return {
       module: RmqModule,
@@ -14,11 +14,11 @@ export class RmqModule {
         ClientsModule.registerAsync([
           {
             name: queue,
-            useFactory: () => {
+            useFactory: (configService: ConfigService) => {
               return {
                 transport: Transport.RMQ,
                 options: {
-                  urls: ["amqp://admin:admin@rabbitmq:5672"],
+                  urls: [configService.get<string>("RABBITMQ_URL")],
                   queue,
                   queueOptions: {
                     durable: false
@@ -26,6 +26,7 @@ export class RmqModule {
                 }
               };
             },
+            inject: [ConfigService]
           }
         ])
       ],

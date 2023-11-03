@@ -3,7 +3,7 @@ import { TransactionsController } from "./transactions.controller";
 import { TransactionsLibModule, TransactionsService } from "@app/transactions-lib";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { RmqModule } from "@app/rmq";
+import { Queue, RmqModule } from "@app/rmq";
 
 @Module({
   imports: [
@@ -21,10 +21,10 @@ import { RmqModule } from "@app/rmq";
       }),
       inject: [ConfigService]
     }),
-    RmqModule.forRoot("default_queue"),
+    RmqModule.forRoot(Queue.TRANSACTIONS_QUEUE),
     TransactionsLibModule
   ],
   controllers: [TransactionsController],
-  providers: [TransactionsService],
+  providers: [TransactionsService]
 })
 export class TransactionsModule {}

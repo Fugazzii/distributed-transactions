@@ -1,8 +1,8 @@
 import { AccountResponse, CreateAccountDto } from '@app/accounts-lib';
 import { ITransaction } from '@app/common';
-import { AccountEvent, AccountMessage, BlacklistMessage, RmqService, TransactionEvent, TransactionMessage } from '@app/rmq';
+import { AccountEvent, AccountMessage, BlacklistMessage, Queue, TransactionEvent, TransactionMessage } from '@app/rmq';
 import { NewTxDto } from '@app/transactions-lib';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 export type ResponseObject<T = undefined> = { 
@@ -15,8 +15,10 @@ export type ResponseObject<T = undefined> = {
 export class OrchestratorService {
   
   public constructor(
-    private readonly rmqService: RmqService,
-    @Inject("accounts_queue") private readonly rmq: ClientProxy
+    @Inject(Queue.ACCOUNTS_QUEUE) private readonly accountsQueue: ClientProxy,
+    @Inject(Queue.TRANSACTIONS_QUEUE) private readonly transactionsQueue: ClientProxy,
+    @Inject(Queue.BLACKLIST_QUEUE) private readonly blacklistQueue: ClientProxy,
+    @Inject(Queue.ORCHESTRATOR_QUEUE) private readonly orchestratorQueue: ClientProxy
   ) {}
 
   public async performPayment(newTxDto: NewTxDto): Promise<ResponseObject> {
@@ -25,7 +27,7 @@ export class OrchestratorService {
     const txDetailsString = JSON.stringify(txDetails);
 
     // Publish verify message to accounts ms
-    const accountResponse$ = this.rmqService.publishMessage<ITransaction>(
+    const accountResponse$ = this.accountsQueue.send<ITransaction>(
       AccountMessage.VERIFY, 
       txDetailsString
     );
@@ -37,7 +39,7 @@ export class OrchestratorService {
 
     if(!accountMsSuccessed) {
       //! Rollback accounts transaction if it fails
-      await this.rollbackAccounts(); 
+      this.rollbackAccounts(); 
       return this.failureResponse("Transaction failed due to insufficient funds");
     }
 
@@ -46,11 +48,11 @@ export class OrchestratorService {
     const txMembersString = JSON.stringify(txMembers);
 
     // Publish verify message to blacklist ms
-    const blacklistResponse$ = this.rmqService.publishMessage<boolean>(
+    const blacklistResponse$ = this.blacklistQueue.send<boolean>(
       BlacklistMessage.VERIFY,
       txMembersString
     );
-    console.log(blacklistResponse$)
+
     let blacklistMsSuccessed = false;
     blacklistResponse$.subscribe((data: boolean) => {
       blacklistMsSuccessed = data;
@@ -61,7 +63,7 @@ export class OrchestratorService {
     }
     
     // Publish verify message to transactions ms
-    const transactionResponse$ = this.rmqService.publishMessage<boolean>(
+    const transactionResponse$ = this.transactionsQueue.send<boolean>(
       TransactionMessage.ADD,
       txDetailsString
     );
@@ -73,20 +75,21 @@ export class OrchestratorService {
 
     if(!transactionMsSuccessed) {
       //! Rollback all transactions if here fails
-      await this.rollbackAll();
+      this.rollbackAll();
       return this.failureResponse("Failed to perform transaction");
     }
     
     //* Commit all transactions in case of success
-    await this.commitAll();
+    this.commitAll();
     
     return this.successResponse("Successfully performed transaction");
   }
 
   public async createAccount(createAccountDto: CreateAccountDto): Promise<ResponseObject<AccountResponse>> {
     const accountStr = JSON.stringify(createAccountDto);
-
-    const response$ = this.rmq.send<AccountResponse>(
+    
+    await this.accountsQueue.connect();
+    const response$ = this.accountsQueue.send<AccountResponse>(
       AccountMessage.CREATE,
       accountStr
     );
@@ -115,33 +118,45 @@ export class OrchestratorService {
    * COMMITS
    */
 
-  private async commitAll() {
-    await this.commitAccounts();
-    await this.commitTransactions();
+  private commitAll() {
+    this.commitAccounts();
+    this.commitTransactions();
   }
 
   private commitAccounts() {
-    return this.rmqService.publishEvent(AccountEvent.COMMIT);
+    return this.accountsQueue.emit(AccountEvent.COMMIT, "");
   }
 
   private commitTransactions() {
-    return this.rmqService.publishEvent(TransactionEvent.COMMIT);
+    return this.transactionsQueue.emit(TransactionEvent.COMMIT, "");
   }
 
   /**
    * ROLLBACKS
    */
 
-  private async rollbackAll() {
-    await this.rollbackAccounts();
-    await this.rollbackTransactions();
+  private rollbackAll() {
+    this.rollbackAccounts();
+    this.rollbackTransactions();
   }
 
   private rollbackAccounts() {
-    return this.rmqService.publishEvent(AccountEvent.ROLLBACK);
+    return this.accountsQueue.emit(AccountEvent.ROLLBACK, "");
   }
 
   private rollbackTransactions() {
-    return this.rmqService.publishEvent(TransactionEvent.ROLLBACK);
+    return this.transactionsQueue.emit(TransactionEvent.ROLLBACK, "");
+  }
+
+  /**
+   * CONNECT clients
+   */
+  private connectAll(clientProxies: ClientProxy[]): void {
+    clientProxies.map((proxy: ClientProxy) => {
+      proxy
+        .connect()
+        .then(() => console.log("Connected to RabbitMQ"))
+        .catch(err => console.error("Failed to connect to RabbitMQ", err));
+    });
   }
 }

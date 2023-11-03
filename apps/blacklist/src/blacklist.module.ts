@@ -3,7 +3,7 @@ import { BlacklistController } from './blacklist.controller';
 import { BlacklistLibModule, BlacklistService } from '@app/blacklist-lib';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RmqModule } from '@app/rmq';
+import { Queue, RmqModule } from '@app/rmq';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { RmqModule } from '@app/rmq';
       }),
       inject: [ConfigService]
     }),
-    RmqModule.forRoot("default_queue"),
+    RmqModule.forRoot(Queue.BLACKLIST_QUEUE),
     BlacklistLibModule
   ],
   controllers: [
