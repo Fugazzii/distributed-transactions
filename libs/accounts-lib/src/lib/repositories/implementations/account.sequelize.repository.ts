@@ -29,8 +29,9 @@ export class AccountSequelizeRepository implements IAccountRepository {
         }
     }
     
-    public async findOne(id: number): Promise<AccountEntity> {
-        return this.repository.findOne({ where: { id } });
+    public async findOne(idParam: number): Promise<AccountEntity> {
+        const { id, balance, fullName, password } = await this.repository.findOne({ where: { id: idParam } });
+        return { id, balance, fullName, password };
     }
 
     public async beginPaymentTransaction({ fromAccountId, toAccountId, amount }: Omit<NewTxDto, "password">): Promise<ITransaction> {

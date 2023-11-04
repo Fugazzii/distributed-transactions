@@ -36,12 +36,14 @@ export class AccountsController {
   }
 
   @EventPattern(AccountEvent.COMMIT)
-  public commit(@Payload() t: ITransaction): Promise<void> {
-    return t.commit();
+  public async commit(@Payload() tStr: string): Promise<void> {
+    const t = JSON.parse(tStr);
+    await t.commit();
   }
 
   @EventPattern(AccountEvent.ROLLBACK)
-  public rollback(@Payload() t: ITransaction): Promise<void> {
-    return t.rollback();
+  public async rollback(@Payload() tStr: string): Promise<void> {
+    const t = JSON.parse(tStr);
+    await t.rollback();
   }
 }

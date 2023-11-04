@@ -10,7 +10,7 @@ export class TransactionsController {
   public constructor(private readonly transactionsService: TransactionsService) {}
 
   @MessagePattern(TransactionMessage.ADD)
-  public addTransaction(newTxDto: NewTxDto): Promise<number> {
+  public addTransaction(newTxDto: NewTxDto): Promise<ITransaction> {
     return this.transactionsService.addNewTx(newTxDto);
   }
 

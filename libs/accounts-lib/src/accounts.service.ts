@@ -17,7 +17,7 @@ export class AccountsService {
 
     public async findAccount(id: number): Promise<AccountResponse> {
         const accountEntity = await this.accountRepository.findOne(id);
-    
+        
         const { password, ...accountResponse } = accountEntity;
 
         return accountResponse;

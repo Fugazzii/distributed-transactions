@@ -4,6 +4,7 @@ import { AccountEvent, AccountMessage, BlacklistMessage, Queue, TransactionEvent
 import { NewTxDto } from '@app/transactions-lib';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 
 export type ResponseObject<T = undefined> = { 
   success: boolean; 
@@ -32,14 +33,13 @@ export class OrchestratorService {
       txDetailsString
     );
 
-    let accountMsSuccessed: ITransaction = null;
+    let accountTransaction: ITransaction = null;
     accountResponse$.subscribe((data: ITransaction | null) => {
-      accountMsSuccessed = data;
+      console.log("Recieved data", data);
+      accountTransaction = data;
     });
 
-    if(!accountMsSuccessed) {
-      //! Rollback accounts transaction if it fails
-      this.rollbackAccounts(); 
+    if(!accountTransaction) {
       return this.failureResponse("Transaction failed due to insufficient funds");
     }
 
@@ -63,25 +63,28 @@ export class OrchestratorService {
     }
     
     // Publish verify message to transactions ms
-    const transactionResponse$ = this.transactionsQueue.send<boolean>(
+    const transactionResponse$ = this.transactionsQueue.send<ITransaction>(
       TransactionMessage.ADD,
       txDetailsString
     );
 
-    let transactionMsSuccessed = false;
-    transactionResponse$.subscribe((data: boolean) => {
-      transactionMsSuccessed = data;
+    let txTransaction: ITransaction = null;
+    transactionResponse$.subscribe((data: ITransaction) => {
+      txTransaction = data;
     })
 
-    if(!transactionMsSuccessed) {
+    if(!txTransaction) {
       //! Rollback all transactions if here fails
-      this.rollbackAll();
+      this.rollbackAccounts(accountTransaction);
+      this.rollbackTransactions(txTransaction)
       return this.failureResponse("Failed to perform transaction");
     }
     
     //* Commit all transactions in case of success
-    this.commitAll();
+    this.commitAccounts(accountTransaction);
+    this.commitTransactions(txTransaction);
     
+
     return this.successResponse("Successfully performed transaction");
   }
 
@@ -118,45 +121,24 @@ export class OrchestratorService {
    * COMMITS
    */
 
-  private commitAll() {
-    this.commitAccounts();
-    this.commitTransactions();
+  private commitAccounts(t: ITransaction) {
+    return this.accountsQueue.emit<void>(AccountEvent.COMMIT, JSON.stringify(t));
   }
 
-  private commitAccounts() {
-    return this.accountsQueue.emit(AccountEvent.COMMIT, "");
-  }
-
-  private commitTransactions() {
-    return this.transactionsQueue.emit(TransactionEvent.COMMIT, "");
+  private commitTransactions(t: ITransaction) {
+    return this.transactionsQueue.emit<void>(TransactionEvent.COMMIT, JSON.stringify(t));
   }
 
   /**
    * ROLLBACKS
    */
 
-  private rollbackAll() {
-    this.rollbackAccounts();
-    this.rollbackTransactions();
+  private async rollbackAccounts(t: ITransaction) {
+    return this.accountsQueue.emit<void>(AccountEvent.ROLLBACK, JSON.stringify(t));
   }
 
-  private rollbackAccounts() {
-    return this.accountsQueue.emit(AccountEvent.ROLLBACK, "");
+  private rollbackTransactions(t: ITransaction) {
+    return this.transactionsQueue.emit<void>(TransactionEvent.ROLLBACK, JSON.stringify(t));
   }
 
-  private rollbackTransactions() {
-    return this.transactionsQueue.emit(TransactionEvent.ROLLBACK, "");
-  }
-
-  /**
-   * CONNECT clients
-   */
-  private connectAll(clientProxies: ClientProxy[]): void {
-    clientProxies.map((proxy: ClientProxy) => {
-      proxy
-        .connect()
-        .then(() => console.log("Connected to RabbitMQ"))
-        .catch(err => console.error("Failed to connect to RabbitMQ", err));
-    });
-  }
 }
