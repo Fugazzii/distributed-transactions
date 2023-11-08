@@ -38,11 +38,11 @@ export class OrchestratorService {
       return this.failureResponse("Transaction failed due to insufficient funds");
     }
 
-    // // Destructure transaction members
-    // const { amount, ...txMembers } = txDetails;
-    // const txMembersString = JSON.stringify(txMembers);
+    // Destructure transaction members
+    const { amount, ...txMembers } = txDetails;
+    const txMembersString = JSON.stringify(txMembers);
 
-    // // Publish verify message to blacklist ms
+    // Publish verify message to blacklist ms
     // const blacklistResponse$ = this.blacklistQueue.send<boolean>(
     //   BlacklistMessage.VERIFY,
     //   txMembersString
