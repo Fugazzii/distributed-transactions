@@ -13,7 +13,7 @@ export class AccountsController {
   ) {}
 
   @MessagePattern(AccountMessage.VERIFY)
-  public async verifyAccount(@Payload() dataStr: string): Promise<ITransaction> {
+  public async verifyAccount(@Payload() dataStr: string): Promise<string> {
     const txDetails: Omit<NewTxDto, "password"> = JSON.parse(dataStr);
 
     const fromAccount = await this.accountsService.findAccount(txDetails.fromAccountId);
@@ -37,8 +37,8 @@ export class AccountsController {
 
   @EventPattern(AccountEvent.COMMIT)
   public async commit(@Payload() tStr: string): Promise<void> {
-    const t = JSON.parse(tStr);
-    await t.commit();
+    const txId: string = JSON.parse(tStr);
+    await this.accountsService.commitPaymentTransaction(txId);
   }
 
   @EventPattern(AccountEvent.ROLLBACK)

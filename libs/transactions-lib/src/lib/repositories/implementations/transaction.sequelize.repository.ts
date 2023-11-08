@@ -6,25 +6,17 @@ import { TransactionModel } from "../../models";
 import { NewTxDto } from "../../dtos";
 import { TransactionEntity } from "../../entities";
 import { ITransaction, SequelizeTransaction } from "@app/common";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class TransactionSequelizeRepository implements ITransactionRepository {
     
+    private readonly transactionsMap: Map<string, ITransaction>;
+
     public constructor(
         @InjectModel(TransactionModel) private readonly repository: Repository<TransactionModel>
-    ) {}
-    
-    public async beginNewTxTransaction(newTx: NewTxDto): Promise<ITransaction> {
-        const sequelize = this.repository.sequelize;
-        const sequelizeT = await sequelize.transaction();
-        const t = new SequelizeTransaction(sequelizeT);
-
-        await this.repository.create(
-            {...newTx, date: new Date() },
-            { transaction: sequelizeT } 
-        );
-
-        return t;
+    ) {
+        this.transactionsMap = new Map();
     }
 
     public async create(newTx: NewTxDto): Promise<number> {
@@ -38,6 +30,33 @@ export class TransactionSequelizeRepository implements ITransactionRepository {
     
     public async findAll(): Promise<Array<TransactionEntity>> {
         return this.repository.findAll();
+    }
+    
+    public async beginNewTxTransaction(newTx: NewTxDto): Promise<string> {
+        const sequelize = this.repository.sequelize;
+        const sequelizeT = await sequelize.transaction();
+        const t = new SequelizeTransaction(sequelizeT);
+
+        await this.repository.create(
+            {...newTx, date: new Date() },
+            { transaction: sequelizeT } 
+        );
+
+        const uniqueId = randomUUID();
+        
+        this.transactionsMap.set(uniqueId, t);
+
+        return uniqueId;
+    }
+
+    public commitTransaction(txId: string): Promise<void> {
+        const t = this.transactionsMap.get(txId);
+
+        if(!t) {
+            throw new Error("Invalid tx");
+        }
+
+        return t.commit();
     }
 
 }

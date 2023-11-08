@@ -10,17 +10,17 @@ export class TransactionsController {
   public constructor(private readonly transactionsService: TransactionsService) {}
 
   @MessagePattern(TransactionMessage.ADD)
-  public addTransaction(newTxDto: NewTxDto): Promise<ITransaction> {
+  public addTransaction(newTxDto: NewTxDto): Promise<string> {
     return this.transactionsService.addNewTx(newTxDto);
   }
 
   @EventPattern(TransactionEvent.COMMIT)
-  public commit(t: ITransaction): Promise<void> {
-    return t.commit();
+  public commit(txId: string): Promise<void> {
+    return this.transactionsService.commitTransaction(txId);
   }
 
   @EventPattern(TransactionEvent.ROLLBACK)
-  public rollback(t: ITransaction): Promise<void> {
-    return t.rollback();
+  public async rollback(txId: string): Promise<void> {
+    // TODO:
   }
 }

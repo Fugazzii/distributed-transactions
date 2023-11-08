@@ -23,11 +23,11 @@ export class AccountsService {
         return accountResponse;
     }
 
-    public beginPaymentTransaction(txDetails: Omit<NewTxDto, "password">): Promise<ITransaction> {
+    public beginPaymentTransaction(txDetails: Omit<NewTxDto, "password">): Promise<string> {
         return this.accountRepository.beginPaymentTransaction(txDetails);
     }
 
-    public commitPaymentTransaction(t: ITransaction) {
-        return this.accountRepository.commitPaymentTransaction(t);
+    public commitPaymentTransaction(txId: string) {
+        return this.accountRepository.commitPaymentTransaction(txId);
     }
 }

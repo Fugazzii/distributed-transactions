@@ -4,17 +4,22 @@ import { AccountModel } from "../../models";
 import { Injectable } from "@nestjs/common";
 import { AccountEntity } from "../../entities";
 import { NewTxDto } from "@app/transactions-lib";
-import { Sequelize } from "sequelize-typescript";
 import { ITransaction, SequelizeTransaction } from "@app/common";
 import { AccountResponse } from "../../responses";
 import { InjectModel } from "@nestjs/sequelize";
+import { QueryTypes } from "sequelize";
+import { randomUUID } from "crypto";
 
 @Injectable()
 export class AccountSequelizeRepository implements IAccountRepository {
     
+    private readonly transactionsMap: Map<string, ITransaction>;
+
     public constructor(
         @InjectModel(AccountModel) private readonly repository: typeof AccountModel
-    ) {}
+    ) {
+        this.transactionsMap = new Map();
+    }
     
     public async create(createAccountDto: CreateAccountDto): Promise<AccountResponse> {
         try {
@@ -34,25 +39,47 @@ export class AccountSequelizeRepository implements IAccountRepository {
         return { id, balance, fullName, password };
     }
 
-    public async beginPaymentTransaction({ fromAccountId, toAccountId, amount }: Omit<NewTxDto, "password">): Promise<ITransaction> {
+    public async beginPaymentTransaction({ fromAccountId, toAccountId, amount }: Omit<NewTxDto, "password">): Promise<string> {
         const sequelize = this.repository.sequelize;
         const sequelizeT = await sequelize.transaction();
         const t = new SequelizeTransaction(sequelizeT);
 
-        await this.repository.update(
-            { balance: Sequelize.literal(`balance - ${amount}`) },
-            { where: { id: fromAccountId }, transaction: sequelizeT }
-        );
-    
-        await this.repository.update(
-            { balance: Sequelize.literal(`balance + ${amount}`) },
-            { where: { id: toAccountId }, transaction: sequelizeT }
-        );
+        const queryFromAccount = `
+            UPDATE accounts
+            SET balance = balance - :amount
+            WHERE id = :fromAccountId
+        `;
 
-        return t;
+        const queryToAccount = `
+            UPDATE accounts
+            SET balance = balance + :amount
+            WHERE id = :toAccountId
+        `;
+        
+        await sequelize.query(queryFromAccount, {
+            replacements: { amount, fromAccountId },
+            type: QueryTypes.UPDATE,
+            transaction: sequelizeT,
+        });
+
+        await sequelize.query(queryToAccount, {
+            replacements: { amount, toAccountId },
+            type: QueryTypes.UPDATE,
+            transaction: sequelizeT,
+        });
+
+        const uniqueId = randomUUID();
+        this.transactionsMap.set(uniqueId, t);
+        return uniqueId;
     }
 
-    public commitPaymentTransaction(t: ITransaction): Promise<void> {
+    public commitPaymentTransaction(transactionId: string): Promise<void> {
+        const t = this.transactionsMap.get(transactionId);
+
+        if(!t) {
+            throw new Error("Invalid tx");
+        }
+
         return t.commit();
     }
 

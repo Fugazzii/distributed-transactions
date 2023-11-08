@@ -32,13 +32,8 @@ export class OrchestratorService {
       AccountMessage.VERIFY, 
       txDetailsString
     );
-
-    let accountTransaction: ITransaction = null;
-    accountResponse$.subscribe((data: ITransaction | null) => {
-      console.log("Recieved data", data);
-      accountTransaction = data;
-    });
-
+    
+    let accountTransaction: ITransaction = await lastValueFrom(accountResponse$);    
     if(!accountTransaction) {
       return this.failureResponse("Transaction failed due to insufficient funds");
     }
@@ -47,32 +42,24 @@ export class OrchestratorService {
     const { amount, ...txMembers } = txDetails;
     const txMembersString = JSON.stringify(txMembers);
 
-    // Publish verify message to blacklist ms
-    const blacklistResponse$ = this.blacklistQueue.send<boolean>(
-      BlacklistMessage.VERIFY,
-      txMembersString
-    );
+    // // Publish verify message to blacklist ms
+    // const blacklistResponse$ = this.blacklistQueue.send<boolean>(
+    //   BlacklistMessage.VERIFY,
+    //   txMembersString
+    // );
 
-    let blacklistMsSuccessed = false;
-    blacklistResponse$.subscribe((data: boolean) => {
-      blacklistMsSuccessed = data;
-    });
+    // let blacklistMsSuccessed: boolean = await lastValueFrom(blacklistResponse$);
+    // if(!blacklistMsSuccessed) {
+    //   return this.failureResponse("Transaction failed due to blacklisted member");
+    // }
 
-    if(!blacklistMsSuccessed) {
-      return this.failureResponse("Transaction failed due to blacklisted member");
-    }
-    
     // Publish verify message to transactions ms
     const transactionResponse$ = this.transactionsQueue.send<ITransaction>(
       TransactionMessage.ADD,
       txDetailsString
     );
 
-    let txTransaction: ITransaction = null;
-    transactionResponse$.subscribe((data: ITransaction) => {
-      txTransaction = data;
-    })
-
+    let txTransaction: ITransaction = await lastValueFrom(transactionResponse$);
     if(!txTransaction) {
       //! Rollback all transactions if here fails
       this.rollbackAccounts(accountTransaction);
@@ -83,7 +70,6 @@ export class OrchestratorService {
     //* Commit all transactions in case of success
     this.commitAccounts(accountTransaction);
     this.commitTransactions(txTransaction);
-    
 
     return this.successResponse("Successfully performed transaction");
   }

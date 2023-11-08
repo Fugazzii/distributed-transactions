@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ITransactionRepository, TRANSACTION_REPOSITORY_TOKEN } from './lib/repositories';
 import { NewTxDto } from './lib/dtos';
 import { TransactionResponse } from './lib/responses';
-import { ITransaction } from '@app/common';
 
 @Injectable()
 export class TransactionsService {
@@ -11,8 +10,12 @@ export class TransactionsService {
         @Inject(TRANSACTION_REPOSITORY_TOKEN) private readonly txsRepository: ITransactionRepository
     ) {}
 
-    public async addNewTx(newTx: NewTxDto): Promise<ITransaction> {
+    public async addNewTx(newTx: NewTxDto): Promise<string> {
         return this.txsRepository.beginNewTxTransaction(newTx);
+    }
+
+    public commitTransaction(txId: string): Promise<void> {
+        return this.txsRepository.commitTransaction(txId);
     }
 
     public async findAll(): Promise<Array<TransactionResponse>> {
