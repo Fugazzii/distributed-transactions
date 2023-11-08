@@ -12,7 +12,7 @@ export class BlacklistController {
 
   @MessagePattern(BlacklistMessage.VERIFY)
   public async verifyBlacklist(@Payload() txMembersStr: string): Promise<boolean> {
-    console.log("GEEEEEEEEEEEEET");
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     const txMembers: TxMembers = JSON.parse(txMembersStr);
 
     const fromAccount = await this.blacklistService.findAccount(txMembers.fromAccountId);

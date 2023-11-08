@@ -14,12 +14,16 @@ export class TransactionsService {
         return this.txsRepository.beginNewTxTransaction(newTx);
     }
 
+    public async findAll(): Promise<Array<TransactionResponse>> {
+        return this.txsRepository.findAll();
+    }
+
     public commitTransaction(txId: string): Promise<void> {
         return this.txsRepository.commitTransaction(txId);
     }
 
-    public async findAll(): Promise<Array<TransactionResponse>> {
-        return this.txsRepository.findAll();
+    public rollbackTransaction(txId: string): Promise<void> {
+        return this.txsRepository.commitTransaction(txId);
     }
 
 }

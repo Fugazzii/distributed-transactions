@@ -10,7 +10,6 @@ import { Queue, RmqModule } from '@app/rmq';
     ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        schema: configService.get<string>('DB_SCHEMA'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),

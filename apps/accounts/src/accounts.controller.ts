@@ -43,7 +43,7 @@ export class AccountsController {
 
   @EventPattern(AccountEvent.ROLLBACK)
   public async rollback(@Payload() tStr: string): Promise<void> {
-    const t = JSON.parse(tStr);
-    await t.rollback();
+    const txId = JSON.parse(tStr);
+    await this.accountsService.rollbackPaymentTransaction(txId);
   }
 }

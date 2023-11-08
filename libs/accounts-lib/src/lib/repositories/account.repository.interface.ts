@@ -11,4 +11,5 @@ export interface IAccountRepository {
     findOne(id: number): Promise<AccountEntity>;
     beginPaymentTransaction(txDetails: Omit<NewTxDto, "password">): Promise<string>;
     commitPaymentTransaction(t: string): Promise<void>;
+    rollbackPaymentTransaction(txId: string): Promise<void>;
 }

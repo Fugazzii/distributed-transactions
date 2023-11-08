@@ -1,8 +1,7 @@
-import { ITransaction } from '@app/common';
 import { TransactionEvent, TransactionMessage } from '@app/rmq';
 import { NewTxDto, TransactionsService } from '@app/transactions-lib';
 import { Controller } from '@nestjs/common';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class TransactionsController {
@@ -15,12 +14,14 @@ export class TransactionsController {
   }
 
   @EventPattern(TransactionEvent.COMMIT)
-  public commit(txId: string): Promise<void> {
-    return this.transactionsService.commitTransaction(txId);
+  public async commit(@Payload() tStr: string): Promise<void> {
+    const txId = JSON.parse(tStr);
+    await this.transactionsService.commitTransaction(txId);
   }
 
   @EventPattern(TransactionEvent.ROLLBACK)
-  public async rollback(txId: string): Promise<void> {
-    // TODO:
+  public async rollback(@Payload() tStr: string): Promise<void> {
+    const txId = JSON.parse(tStr);
+    await this.transactionsService.rollbackTransaction(txId);
   }
 }

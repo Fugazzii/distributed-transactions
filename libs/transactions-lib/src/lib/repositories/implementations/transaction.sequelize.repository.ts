@@ -53,10 +53,22 @@ export class TransactionSequelizeRepository implements ITransactionRepository {
         const t = this.transactionsMap.get(txId);
 
         if(!t) {
-            throw new Error("Invalid tx");
+            throw new Error("Invalid tx in transactions");
         }
 
+        this.transactionsMap.delete(txId);
         return t.commit();
+    }
+
+    public rollbackTransaction(txId: string): Promise<void> {
+        const t = this.transactionsMap.get(txId);
+
+        if(!t) {
+            throw new Error("Invalid tx during rollback in transactions");
+        }
+
+        this.transactionsMap.delete(txId);
+        return t.rollback();
     }
 
 }

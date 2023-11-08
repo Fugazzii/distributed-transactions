@@ -8,4 +8,5 @@ export interface ITransactionRepository {
     findAll(): Promise<Array<TransactionResponse>>;
     beginNewTxTransaction(newTx: NewTxDto): Promise<string>;
     commitTransaction(txId: string): Promise<void>;
+    rollbackTransaction(txId: string): Promise<void>;
 }

@@ -3,7 +3,6 @@ import { ACCOUNT_REPOSITORY_TOKEN, IAccountRepository } from './lib/repositories
 import { AccountResponse } from './lib/responses';
 import { CreateAccountDto } from './lib/dtos';
 import { NewTxDto } from '@app/transactions-lib';
-import { ITransaction } from '@app/common';
 
 @Injectable()
 export class AccountsService {
@@ -27,7 +26,11 @@ export class AccountsService {
         return this.accountRepository.beginPaymentTransaction(txDetails);
     }
 
-    public commitPaymentTransaction(txId: string) {
+    public commitPaymentTransaction(txId: string): Promise<void> {
         return this.accountRepository.commitPaymentTransaction(txId);
+    }
+
+    public rollbackPaymentTransaction(txId: string): Promise<void> {
+        return this.accountRepository.rollbackPaymentTransaction(txId);
     }
 }

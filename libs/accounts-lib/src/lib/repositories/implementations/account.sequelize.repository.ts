@@ -73,14 +73,26 @@ export class AccountSequelizeRepository implements IAccountRepository {
         return uniqueId;
     }
 
-    public commitPaymentTransaction(transactionId: string): Promise<void> {
-        const t = this.transactionsMap.get(transactionId);
+    public commitPaymentTransaction(txId: string): Promise<void> {
+        const t = this.transactionsMap.get(txId);
 
         if(!t) {
-            throw new Error("Invalid tx");
+            throw new Error("Invalid tx during commit");
         }
 
+        this.transactionsMap.delete(txId);
         return t.commit();
     }
 
+    public rollbackPaymentTransaction(txId: string): Promise<void> {
+        const t = this.transactionsMap.get(txId);
+
+        if(!t) {
+            throw new Error("Invalid tx during rollback");
+        }
+
+        this.transactionsMap.delete(txId);
+        return t.rollback();
+    }
+    
 }
