@@ -7,7 +7,6 @@ import { NewTxDto } from "../../dtos";
 import { TransactionEntity } from "../../entities";
 import { ITransaction, SequelizeTransaction } from "@app/common";
 import { randomUUID } from "crypto";
-import { QueryTypes } from "sequelize";
 
 @Injectable()
 export class TransactionSequelizeRepository implements ITransactionRepository {
@@ -33,34 +32,17 @@ export class TransactionSequelizeRepository implements ITransactionRepository {
         return this.repository.findAll();
     }
     
-    //! ERROR HERE
     public async beginNewTxTransaction(newTx: NewTxDto): Promise<string> {
         const sequelize = this.repository.sequelize;
         const sequelizeT = await sequelize.transaction();
         const t = new SequelizeTransaction(sequelizeT);
     
-        const uniqueId = randomUUID();
-    
-        const sql = `
-            INSERT INTO transactions
-            (fromAccountId, toAccountId, amount, date)
-            VALUES
-            (?, ?, ?, ?)
-        `;
-    
-        const values = [
-            newTx["fromAccountId"],
-            newTx["toAccountId"],
-            newTx["amount"],
-            new Date()
-        ];
-        console.log(newTx,values);
+        await this.repository.create(
+            { ...newTx, date: new Date },
+            { transaction: sequelizeT }
+        );
         
-        await sequelize.query(sql, {
-            replacements: values,
-            type: QueryTypes.INSERT,
-            transaction: sequelizeT,
-        });
+        const uniqueId = randomUUID();
 
         this.transactionsMap.set(uniqueId, t);
 

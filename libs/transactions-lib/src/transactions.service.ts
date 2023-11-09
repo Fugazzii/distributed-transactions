@@ -23,7 +23,7 @@ export class TransactionsService {
     }
 
     public rollbackTransaction(txId: string): Promise<void> {
-        return this.txsRepository.commitTransaction(txId);
+        return this.txsRepository.rollbackTransaction(txId);
     }
 
 }

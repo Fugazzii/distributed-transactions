@@ -43,15 +43,15 @@ export class OrchestratorService {
     const txMembersString = JSON.stringify(txMembers);
 
     // Publish verify message to blacklist ms
-    // const blacklistResponse$ = this.blacklistQueue.send<boolean>(
-    //   BlacklistMessage.VERIFY,
-    //   txMembersString
-    // );
+    const blacklistResponse$ = this.blacklistQueue.send<boolean>(
+      BlacklistMessage.VERIFY,
+      txMembersString
+    );
 
-    // let blacklistMsSuccessed: boolean = await lastValueFrom(blacklistResponse$);
-    // if(!blacklistMsSuccessed) {
-    //   return this.failureResponse("Transaction failed due to blacklisted member");
-    // }
+    let blacklistMsSuccessed: boolean = await lastValueFrom(blacklistResponse$);
+    if(!blacklistMsSuccessed) {
+      return this.failureResponse("Transaction failed due to blacklisted member");
+    }
 
     // Publish verify message to transactions ms
     const transactionResponse$ = this.transactionsQueue.send<ITransaction>(

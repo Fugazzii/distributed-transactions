@@ -9,7 +9,8 @@ export class TransactionsController {
   public constructor(private readonly transactionsService: TransactionsService) {}
 
   @MessagePattern(TransactionMessage.ADD)
-  public addTransaction(newTxDto: NewTxDto): Promise<string> {
+  public addTransaction(@Payload() txStr: string): Promise<string> {
+    const newTxDto: NewTxDto = JSON.parse(txStr);
     return this.transactionsService.addNewTx(newTxDto);
   }
 

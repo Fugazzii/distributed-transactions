@@ -35,7 +35,10 @@ import { ConfigModule } from "@nestjs/config";
           transport: Transport.RMQ,
           options: {
             urls: ["amqp://admin:admin@rabbitmq:5672"],
-            queue: "Queue.BLACKLIST_QUEUE"
+            queue: Queue.BLACKLIST_QUEUE,
+            queueOptions: {
+              durable: false
+            }
           }
         });
       },
